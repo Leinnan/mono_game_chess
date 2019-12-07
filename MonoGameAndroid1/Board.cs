@@ -42,8 +42,83 @@ namespace MonoGameAndroid1
             pieces[22] = new Piece(5, 5, Piece.PieceColor.Black);
             pieces[23] = new Piece(7, 5, Piece.PieceColor.Black);
         }
+        
+        public bool IsAnyPieceOnPos(int x,int y)
+        {
+            for (var i = 0; i < pieces.Length; i++)
+            {
+                if (pieces[i].pos.x == x && pieces[i].pos.y == y)
+                    return true;
+            }
 
-        public void IsOverPiece(Vector2 pos)
+            return false;
+        }
+
+        public void UpdatePosibleMoves(int x, int y)
+        {
+            if (!IsAnyPieceOnPos(x, y))
+            {
+                return;
+            }
+            if (x > 0 && y > 0)
+            {
+                if (!IsAnyPieceOnPos(x - 1, y - 1) && fields[x - 1, y - 1].isDark)
+                {
+                    Console.WriteLine($"Possible move on {x-1}x{y-1}");
+                }
+            }
+            if (x > 0)
+            {
+                if (!IsAnyPieceOnPos(x - 1, y) && fields[x - 1, y].isDark)
+                {
+                    Console.WriteLine($"Possible move on {x-1}x{y}");
+                }
+            }
+            if (x > 0 && y < (Consts.BOARD_SIZE - 1))
+            {
+                if (!IsAnyPieceOnPos(x - 1, y + 1) && fields[x - 1, y + 1].isDark)
+                {
+                    Console.WriteLine($"Possible move on {x-1}x{y+1}");
+                }
+            }
+            if (y < (Consts.BOARD_SIZE - 1))
+            {
+                if (!IsAnyPieceOnPos(x, y + 1) && fields[x, y + 1].isDark)
+                {
+                    Console.WriteLine($"Possible move on {x}x{y+1}");
+                }
+            }
+            if (x < (Consts.BOARD_SIZE - 1) && y < (Consts.BOARD_SIZE - 1))
+            {
+                if (!IsAnyPieceOnPos(x+1, y + 1) && fields[x + 1, y + 1].isDark)
+                {
+                    Console.WriteLine($"Possible move on {x+1}x{y+1}");
+                }
+            }
+            if (x < (Consts.BOARD_SIZE - 1))
+            {
+                if (!IsAnyPieceOnPos(x+1, y ) && fields[x + 1, y].isDark)
+                {
+                    Console.WriteLine($"Possible move on {x+1}x{y}");
+                }
+            }
+            if (x < (Consts.BOARD_SIZE - 1) && y > 0)
+            {
+                if (!IsAnyPieceOnPos(x+1, y - 1) && fields[x + 1, y - 1].isDark)
+                {
+                    Console.WriteLine($"Possible move on {x+1}x{y-1}");
+                }
+            }
+            if ( y > 0)
+            {
+                if (!IsAnyPieceOnPos(x, y - 1) && fields[x, y - 1].isDark)
+                {
+                    Console.WriteLine($"Possible move on {x}x{y-1}");
+                }
+            }
+        }
+        
+        public void BoardClicked(Vector2 pos)
         {
             var size = new Vector2i(80, 80);
             for (var i = 0; i < fields.GetLength(0); i++)
@@ -56,6 +131,7 @@ namespace MonoGameAndroid1
                     if (diff.X > 0 && diff.X < size.x && diff.Y > 0 && diff.Y < size.y)
                     {
                         Console.WriteLine($"Input on field {i}x{j}");
+                        UpdatePosibleMoves(i,j);
                     }
                 }
             }

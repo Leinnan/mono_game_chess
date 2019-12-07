@@ -54,7 +54,7 @@ namespace MonoGameAndroid1 {
 
         public override void OnMouseReleased (Vector2 mousePos, Vector2 movement)
         {
-            board.IsOverPiece(mousePos);
+            board.BoardClicked(mousePos);
         }
         
         public override void OnLoad(ContentManager content, GraphicsDevice graphics)
