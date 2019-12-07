@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ContentModelStore">
+    <e p="C:\Users\48785\.Rider2019.2\system\extResources" t="IncludeRecursive" />
+    <e p="C:\Users\48785\.Rider2019.2\system\resharper-host\local\Transient\ReSharperHost\v192\SolutionCaches\_.19.00" t="ExcludeRecursive" />
+    <e p="D:\PROJECTS\MonoGameAndroid1\MonoGameAndroid1" t="IncludeRecursive">
+      <e p="Activity1.cs" t="Include" />
+      <e p="Assets" t="Include">
+        <e p="AboutAssets.txt" t="Include" />
+      </e>
+      <e p="bin" t="ExcludeRecursive" />
+      <e p="Content" t="Include">
+        <e p="Content.mgcb" t="Include" />
+      </e>
+      <e p="Game1.cs" t="Include" />
+      <e p="MonoGameAndroid1.csproj" t="IncludeRecursive" />
+      <e p="obj" t="ExcludeRecursive" />
+      <e p="packages" t="ExcludeRecursive" />
+      <e p="Properties" t="Include">
+        <e p="AssemblyInfo.cs" t="Include" />
+      </e>
+      <e p="Resources" t="Include">
+        <e p="AboutResources.txt" t="Include" />
+        <e p="Drawable" t="Include">
+          <e p="Icon.png" t="Include" />
+          <e p="Splash.png" t="Include" />
+        </e>
+        <e p="Layout" t="Include" />
+        <e p="Resource.Designer.cs" t="Include" />
+        <e p="Values" t="Include">
+          <e p="Strings.xml" t="Include" />
+          <e p="Styles.xml" t="Include" />
+        </e>
+      </e>
+    </e>
+  </component>
+</project>
