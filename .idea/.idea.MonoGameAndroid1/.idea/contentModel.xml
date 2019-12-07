@@ -11,13 +11,17 @@
           <e p="AboutAssets.txt" t="Include" />
         </e>
         <e p="bin" t="ExcludeRecursive" />
+        <e p="Board.cs" t="Include" />
+        <e p="Consts.cs" t="Include" />
         <e p="Content" t="Include">
           <e p="Content.mgcb" t="Include" />
         </e>
+        <e p="Field.cs" t="Include" />
         <e p="Game1.cs" t="Include" />
         <e p="GameState.cs" t="Include" />
         <e p="MonoGameAndroid1.csproj" t="IncludeRecursive" />
         <e p="obj" t="ExcludeRecursive" />
+        <e p="Piece.cs" t="Include" />
         <e p="Properties" t="Include">
           <e p="AssemblyInfo.cs" t="Include" />
         </e>
@@ -36,6 +40,7 @@
         </e>
         <e p="State.cs" t="Include" />
         <e p="StateHandler.cs" t="Include" />
+        <e p="Vector2i.cs" t="Include" />
       </e>
       <e p="MonoGameAndroid1.sln" t="IncludeFlat" />
       <e p="packages" t="ExcludeRecursive" />

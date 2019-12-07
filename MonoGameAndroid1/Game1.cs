@@ -17,9 +17,11 @@ namespace MonoGameAndroid1
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
-
-            graphics.IsFullScreen = true;
+            var graphicsDeviceManager = (GraphicsDeviceManager) Services.GetService(typeof(IGraphicsDeviceManager));
+            graphics.PreferredBackBufferWidth = graphicsDeviceManager.PreferredBackBufferWidth;
+            graphics.PreferredBackBufferHeight = graphicsDeviceManager.PreferredBackBufferHeight;
             graphics.SupportedOrientations = DisplayOrientation.Portrait;
+            graphics.ApplyChanges();
         }
 
         /// <summary>

@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Input.Touch;
 
 namespace MonoGameAndroid1 {
     public abstract class State{
@@ -11,6 +12,7 @@ namespace MonoGameAndroid1 {
         MouseState m_prevMouseState;
         private bool m_exitGameRequest = false;
         private bool m_inputEnabled = true;
+        private bool wereInputInLastFrame = false;
 
         Vector2 m_pressedMousePos;
         Vector2 m_mousePos;
@@ -65,6 +67,18 @@ namespace MonoGameAndroid1 {
 
         protected void HandleMouse () {
             MouseState currState = Mouse.GetState ();
+            TouchCollection touchCollection = TouchPanel.GetState();
+            bool isInputNow = touchCollection.Count > 0;
+            
+            if (isInputNow && !wereInputInLastFrame)
+            {
+                OnMousePressed (touchCollection[0].Position);
+                m_pressedMousePos = touchCollection[0].Position;
+            } else if (!isInputNow && wereInputInLastFrame)
+            {
+                OnMouseReleased (m_pressedMousePos, m_pressedMousePos);
+            }
+
             Vector2 movement = currState.Position.ToVector2 ();
             if (m_prevMouseState.LeftButton == ButtonState.Pressed &&
                 currState.LeftButton == ButtonState.Pressed) {
@@ -79,6 +93,8 @@ namespace MonoGameAndroid1 {
                 OnMousePressed (currState.Position.ToVector2 ());
                 m_pressedMousePos = currState.Position.ToVector2 ();
             }
+
+            wereInputInLastFrame = isInputNow;
             m_prevMouseState = Mouse.GetState ();
         }
     }

@@ -12,7 +12,10 @@ namespace MonoGameAndroid1 {
 
         private SpriteFont font;
         private Texture2D background;
+        private Texture2D fieldTexture;
+        private Texture2D pieceTexture;
         private (int,int) screenSize;
+        private Board board = new Board();
         
         public GameState(){}
 
@@ -49,16 +52,19 @@ namespace MonoGameAndroid1 {
             }
         }
 
-        public override void OnMouseReleased (Vector2 mousePos, Vector2 movement) 
+        public override void OnMouseReleased (Vector2 mousePos, Vector2 movement)
         {
-            Console.WriteLine("[MOVEMENT] " + movement.X + " " + movement.Y );
+            board.IsOverPiece(mousePos);
         }
         
         public override void OnLoad(ContentManager content, GraphicsDevice graphics)
         {
             screenSize = (graphics.Viewport.Width,graphics.Viewport.Height);
+            board.StartPos = new Vector2i((screenSize.Item1 - Consts.BOARD_SIZE * 80)/2,(screenSize.Item2 - Consts.BOARD_SIZE * 80)/2);
             Console.WriteLine("OnLoad"); 
-            font = content.Load<SpriteFont>("Font"); // Use the name of your sprite font file here instead of 'Score'.
+            font = content.Load<SpriteFont>("Font");
+            fieldTexture = content.Load<Texture2D>("field");
+            pieceTexture = content.Load<Texture2D>("piece");
             background = content.Load<Texture2D>("bg");
         }
         public override void OnUnload(ContentManager content, GraphicsDevice graphics)
@@ -68,8 +74,8 @@ namespace MonoGameAndroid1 {
         public override void OnDraw(ref SpriteBatch spriteBatch)
         {
             //Console.WriteLine("OnDraw"); 
-            spriteBatch.Draw(background, new Vector2(0, 0), Color.White);
-            spriteBatch.Draw(background,new Rectangle(0,0,screenSize.Item1,screenSize.Item2), Color.White);
+            spriteBatch.Draw(background,new Rectangle(-50,0,screenSize.Item1+100,screenSize.Item2), Color.White);
+            board.Draw(ref spriteBatch,fieldTexture,pieceTexture);
             spriteBatch.DrawString(font, "Score: " + 10.ToString(), new Vector2(10, 10), Color.White);
         }  
     }
