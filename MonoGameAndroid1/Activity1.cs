@@ -5,7 +5,7 @@ using Android.Views;
 
 namespace MonoGameAndroid1
 {
-    [Activity(Label = "MonoGameAndroid1"
+    [Activity(Label = "WarcabyUKW"
         , MainLauncher = true
         , Icon = "@drawable/icon"
         , Theme = "@style/Theme.Splash"

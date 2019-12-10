@@ -16,16 +16,20 @@ namespace MonoGameAndroid1
         };
         private Piece[] pieces = new Piece[Consts.PIECES_PER_PLAYER*2];
         private Vector2i selectedField = WRONG_POS;
-        private List<Move> possibleMoves = new List<Move>();
+        private List<Move> allPossibleMoves = new List<Move>();
         Field[] fields = new Field[Consts.BOARD_SIZE * Consts.BOARD_SIZE];
         public Vector2i StartPos { get; set; }
         public Field[] Fields => fields;
         public Piece[] AlivePieces => pieces.Where(piece => piece.Alive).ToArray();
+        private bool IsGameEnded => allPossibleMoves.Count == 0;
 
         public Vector2i SelectedField => selectedField;
 
-        public List<Move> PossibleMoves => possibleMoves;
+        public List<Move> PossibleMoves => AnyFieldSelected ? allPossibleMoves.Where(move => move.StartPos == selectedField).ToList() : new List<Move>();
 
+        public List<Vector2i> PiecesWithMoves => AlivePieces
+            .Where(piece => allPossibleMoves.Any(move => move.StartPos == piece.pos)).Select(piece => piece.pos)
+            .ToList();
         public bool AnyFieldSelected
         {
             get => SelectedField != WRONG_POS;
@@ -75,6 +79,7 @@ namespace MonoGameAndroid1
             pieces[23] = new Piece(7, 5, Piece.PieceColor.Black);
             ActiveColor = Piece.PieceColor.White;
             AnyFieldSelected = false;
+            UpdatePosibleMoves();
         }
         
         bool IsAnyPieceOnPos(Vector2i pos)
@@ -111,71 +116,54 @@ namespace MonoGameAndroid1
 
             return true;
         }
-        bool CheckPosForMove(Piece piece, int x, int y)
+        bool CheckPosForMove(Piece piece, Vector2i pos)
         {
-            var newPos = new Vector2i(x,y);
-            var moveCheck = piece.pos.y < y ? piece.MovesDown : piece.MovesUp;
-            bool canMove = moveCheck && CanMovePieceToPos(newPos);
+            var moveCheck = piece.pos.y < pos.y ? piece.MovesDown : piece.MovesUp;
+            bool canMove = moveCheck && CanMovePieceToPos(pos);
             if (canMove)
             {
-                Console.WriteLine($"Possible move on {newPos.x}x{newPos.y}");
-                possibleMoves.Add(new Move(selectedField, newPos));
+                Console.WriteLine($"Possible move on {pos.x}x{pos.y}");
+                allPossibleMoves.Add(new Move(piece.pos, pos));
             }
 
             return canMove;
         }
 
-        void UpdatePosibleMoves(int x, int y)
+        void UpdatePosibleMoves()
         {
-            var pos = new Vector2i(x, y);
-            if (!IsAnyPieceOnPos(pos))
+            allPossibleMoves.Clear();
+            var piecesToCheck = pieces.Where(piece => piece.color == ActiveColor && piece.Alive);
+            foreach (var piece in piecesToCheck)
             {
-                var move = possibleMoves.Count > 0 ? possibleMoves.First(move1 => move1.EndPos == pos) : null;
-                if (move != null)
+                if (piece.isQueen)
                 {
-                    MakeMove(move);
-                }
-                return;
-            }
-
-            var piece = PieceOnPos(pos);
-
-            if (piece.color != ActiveColor)
-            {
-                return;
-            }
-            selectedField.x = x;
-            selectedField.y = y;
-            possibleMoves.Clear();
-            
-            if (piece.isQueen)
-            {
-                foreach (var direction in directions)
-                {
-                    for (int i = 1; i < Consts.BOARD_SIZE;++i)
+                    foreach (var direction in directions)
                     {
-                        var canMove = CheckPosForMove(piece, x+ direction.x * i,y+direction.y * i);
-                        if (!canMove)
-                            break;
+                        for (int i = 1; i < Consts.BOARD_SIZE;++i)
+                        {
+                            var canMove = CheckPosForMove(piece, piece.pos + (direction * i));
+                            if (!canMove)
+                                break;
+                        }
                     }
                 }
-            }
-            else
-            {
-                foreach (var direction in directions)
+                else
                 {
-                    CheckPosForMove(piece, x+ direction.x,y+direction.y);
+                    foreach (var direction in directions)
+                    {
+                        CheckPosForMove(piece, piece.pos+direction);
+                    }
                 }
-            }
 
-            CheckForCaptures(piece);
+                CheckForCaptures(piece);
+            }
 
             // jesli mamy jakis ruch w ktorym zbijamy przeciwnika pozbedziemy
             // sie tych gdzie nie ma bicia
-            if (possibleMoves.Any(move => move.PosToRemovePieces.Count > 0))
+            if (allPossibleMoves.Any(move => move.PosToRemovePieces.Count > 0))
             {
-                var newMovesList = possibleMoves.Where(move => move.PosToRemovePieces.Count > 0).ToList();
-                possibleMoves = newMovesList;
+                var newMovesList = allPossibleMoves.Where(move => move.PosToRemovePieces.Count > 0).ToList();
+                allPossibleMoves = newMovesList;
             }
         }
 
@@ -196,7 +184,7 @@ namespace MonoGameAndroid1
                     if (isNextFieldEmpty)
                     {
                         move.AddNewStep(posAfterCapture);
-                        possibleMoves.Add(move);
+                        allPossibleMoves.Add(move);
                     }
                 }
             }
@@ -237,17 +225,32 @@ namespace MonoGameAndroid1
                     continue;
                 
                 Console.WriteLine($"Input on field {field.pos.x}x{field.pos.y}");
-                UpdatePosibleMoves(field.pos.x,field.pos.y);
+                if (AnyFieldSelected && !IsAnyPieceOnPos(field.pos))
+                {
+                    var move = PossibleMoves.Count > 0 ? PossibleMoves.FirstOrDefault(move1 => move1.EndPos == field.pos) : null;
+                    if (move != null)
+                    {
+                        MakeMove(move);
+                    }
+                }
+                else if (PieceColorOnPos(field.pos) == ActiveColor)
+                {
+                    selectedField = field.pos;
+                }
             }
         }
 
         void ChangePlayer()
         {
             AnyFieldSelected = false;
-            possibleMoves.Clear();
             ActiveColor = ActiveColor == Piece.PieceColor.White ? Piece.PieceColor.Black : Piece.PieceColor.White;
+            UpdatePosibleMoves();
+            if (IsGameEnded)
+            {
+                StartGame();
+            }
         }
-        
+
         Field FieldAtPos(Vector2i pos)
         {
             return fields.FirstOrDefault(field => field.pos == pos);

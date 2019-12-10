@@ -4,7 +4,7 @@
           android:versionName="1.0" 
           package="MonoGameAndroid1.MonoGameAndroid1">
   <uses-sdk android:minSdkVersion="21" android:targetSdkVersion="28" />
-  <application android:allowBackup="true" android:label="MonoGameAndroid1" android:supportsRtl="true">
+  <application android:allowBackup="true" android:label="WarcabyUKW" android:supportsRtl="true">
   </application>
   <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
   <uses-permission android:name="android.Manifest.permission.RECORD_AUDIO"/>

@@ -42,5 +42,6 @@
         public static Vector2i operator +(Vector2i c1, Vector2i c2) => new Vector2i(c1.x + c2.x, c1.y + c2.y);
         public static Vector2i operator -(Vector2i c1, Vector2i c2) => new Vector2i(c1.x - c2.x, c1.y - c2.y);
         public static Vector2i operator /(Vector2i c1, int value) => new Vector2i(c1.x / value, c1.y / value);
+        public static Vector2i operator *(Vector2i c1, int value) => new Vector2i(c1.x * value, c1.y * value);
     }
 }

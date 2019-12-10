@@ -6,8 +6,8 @@ using Android.App;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("MonoGameAndroid1")]
-[assembly: AssemblyProduct("MonoGameAndroid1")]
+[assembly: AssemblyTitle("WarcabyUKW")]
+[assembly: AssemblyProduct("WarcabyUKW")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyCompany("")]

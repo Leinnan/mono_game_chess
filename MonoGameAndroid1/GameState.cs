@@ -84,6 +84,7 @@ namespace MonoGameAndroid1 {
             var startPos = board.StartPos;
             var pieces = board.AlivePieces;
             var possibleMoves = board.PossibleMoves;
+            var moveablePieces = board.PiecesWithMoves;
             var size = new Vector2i(80, 80);
             Vector2i margin = new Vector2i(8,8);
             
@@ -92,6 +93,13 @@ namespace MonoGameAndroid1 {
                 spriteBatch.Draw(fieldTexture,
                     new Rectangle(startPos.x + (field.pos.x * size.x), startPos.y + (field.pos.y * size.y), size.x,
                         size.y), field.isDark ? Color.Gray : Color.White);
+            }
+
+            foreach (var moveablePiece in moveablePieces)
+            {
+                spriteBatch.Draw(fieldTexture,
+                    new Rectangle(startPos.x + (moveablePiece.x * size.x), startPos.y + (moveablePiece.y * size.y), size.x,
+                        size.y), Color.Orange);
             }
 
             if (board.AnyFieldSelected)
@@ -113,7 +121,7 @@ namespace MonoGameAndroid1 {
                     new Rectangle(startPos.x + (piece.pos.x * size.x) + margin.x, startPos.y + (piece.pos.y * size.y)+margin.y, size.x - margin.x*2,
                         size.y-margin.y*2), piece.color == Piece.PieceColor.Black ? Color.DarkGray : Color.White);
             }
-            spriteBatch.DrawString(font, "Score: " + 10.ToString(), new Vector2(10, 10), Color.White);
+            //spriteBatch.DrawString(font, "Score: " + 10.ToString(), new Vector2(10, 10), Color.White);
         }  
     }
 }
