@@ -9,6 +9,11 @@ namespace MonoGameAndroid1
     public class Board
     {
         static readonly Vector2i WRONG_POS = new Vector2i(-1,-1);
+        static readonly Vector2i[] directions = 
+        {
+            new Vector2i(- 1,  - 1), new Vector2i( + 1,  - 1), new Vector2i( - 1,  + 1),
+            new Vector2i( + 1,  + 1),
+        };
         private Piece[] pieces = new Piece[Consts.PIECES_PER_PLAYER*2];
         private Vector2i selectedField = WRONG_POS;
         private List<Move> possibleMoves = new List<Move>();
@@ -77,43 +82,47 @@ namespace MonoGameAndroid1
             return AlivePieces.Any(piece => piece.pos == pos);
         }
 
-        Piece.PieceColor PieceColorOnPos(int x, int y)
+        Piece.PieceColor PieceColorOnPos(Vector2i pos)
         {
             for (var i = 0; i < pieces.Length; i++)
             {
-                if (pieces[i].pos.x == x && pieces[i].pos.y == y)
+                if (pieces[i].Alive && pieces[i].pos == pos)
                     return pieces[i].color;
             }
 
             return Piece.PieceColor.None;
         }
         
-        bool CanMovePieceToPos(int x,int y)
+        
+        
+        bool CanMovePieceToPos(Vector2i pos)
         {
-            if (x < 0 || x > Consts.BOARD_SIZE || y < 0 || y > Consts.BOARD_SIZE)
+            if (pos.x < 0 || pos.x >= Consts.BOARD_SIZE || pos.y < 0 || pos.y >= Consts.BOARD_SIZE)
                 return false;
 
-            if (!FieldAtPos(x, y).isDark)
+            if (!FieldAtPos(pos).isDark)
                 return false;
             
             for (var i = 0; i < pieces.Length; i++)
             {
-                if (pieces[i].pos.x == x && pieces[i].pos.y == y)
+                if (pieces[i].pos == pos && pieces[i].Alive)
                     return false;
             }
 
             return true;
         }
-        void CheckPosForMove(Piece piece, int x, int y)
+        bool CheckPosForMove(Piece piece, int x, int y)
         {
             var newPos = new Vector2i(x,y);
             var moveCheck = piece.pos.y < y ? piece.MovesDown : piece.MovesUp;
-            
-            if (moveCheck && CanMovePieceToPos(newPos.x, newPos.y))
+            bool canMove = moveCheck && CanMovePieceToPos(newPos);
+            if (canMove)
             {
                 Console.WriteLine($"Possible move on {newPos.x}x{newPos.y}");
                 possibleMoves.Add(new Move(selectedField, newPos));
             }
+
+            return canMove;
         }
 
         void UpdatePosibleMoves(int x, int y)
@@ -121,7 +130,7 @@ namespace MonoGameAndroid1
             var pos = new Vector2i(x, y);
             if (!IsAnyPieceOnPos(pos))
             {
-                var move = possibleMoves.First(move1 => move1.EndPos == pos);
+                var move = possibleMoves.Count > 0 ? possibleMoves.First(move1 => move1.EndPos == pos) : null;
                 if (move != null)
                 {
                     MakeMove(move);
@@ -139,17 +148,65 @@ namespace MonoGameAndroid1
             selectedField.y = y;
             possibleMoves.Clear();
             
-            CheckPosForMove(piece, x-1, y-1);
-            CheckPosForMove(piece, x+1, y-1);
-            CheckPosForMove(piece, x-1, y+1);
-            CheckPosForMove(piece, x+1, y+1);
+            if (piece.isQueen)
+            {
+                foreach (var direction in directions)
+                {
+                    for (int i = 1; i < Consts.BOARD_SIZE;++i)
+                    {
+                        var canMove = CheckPosForMove(piece, x+ direction.x * i,y+direction.y * i);
+                        if (!canMove)
+                            break;
+                    }
+                }
+            }
+            else
+            {
+                foreach (var direction in directions)
+                {
+                    CheckPosForMove(piece, x+ direction.x,y+direction.y);
+                }
+            }
+
+            CheckForCaptures(piece);
+
+            // jesli mamy jakis ruch w ktorym zbijamy przeciwnika pozbedziemy
+            // sie tych gdzie nie ma bicia
+            if (possibleMoves.Any(move => move.PosToRemovePieces.Count > 0))
+            {
+                var newMovesList = possibleMoves.Where(move => move.PosToRemovePieces.Count > 0).ToList();
+                possibleMoves = newMovesList;
+            }
+        }
+
+        private void CheckForCaptures(Piece piece)
+        {
+            foreach (var direction in directions)
+            {
+                var startPos = piece.pos;
+                var move = new Move(startPos);
+                var enemyColor = ActiveColor == Piece.PieceColor.Black
+                    ? Piece.PieceColor.White
+                    : Piece.PieceColor.Black;
+                var posToCheck = startPos + direction;
+                if (PieceColorOnPos(posToCheck) == enemyColor)
+                {
+                    var posAfterCapture = posToCheck + direction;
+                    var isNextFieldEmpty = CanMovePieceToPos(posAfterCapture);
+                    if (isNextFieldEmpty)
+                    {
+                        move.AddNewStep(posAfterCapture);
+                        possibleMoves.Add(move);
+                    }
+                }
+            }
         }
 
         private Piece PieceOnPos(Vector2i pos)
         {
             foreach (var piece in pieces)
             {
-                if (piece.pos == pos)
+                if (piece.Alive && piece.pos == pos)
                     return piece;
             }
 
@@ -191,9 +248,9 @@ namespace MonoGameAndroid1
             ActiveColor = ActiveColor == Piece.PieceColor.White ? Piece.PieceColor.Black : Piece.PieceColor.White;
         }
         
-        Field FieldAtPos(int x, int y)
+        Field FieldAtPos(Vector2i pos)
         {
-            return fields.FirstOrDefault(field => field.pos.x == x && field.pos.y == y);
+            return fields.FirstOrDefault(field => field.pos == pos);
         }
     }
 }
