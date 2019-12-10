@@ -14,6 +14,7 @@ namespace MonoGameAndroid1 {
         private Texture2D background;
         private Texture2D fieldTexture;
         private Texture2D pieceTexture;
+        private Texture2D emptyTexture;
         private (int,int) screenSize;
         private Board board = new Board();
         
@@ -66,6 +67,8 @@ namespace MonoGameAndroid1 {
             fieldTexture = content.Load<Texture2D>("field");
             pieceTexture = content.Load<Texture2D>("piece");
             background = content.Load<Texture2D>("bg");
+            emptyTexture = new Texture2D(graphics, 1, 1);
+            emptyTexture.SetData(new Color[]{Color.White});
         }
         public override void OnUnload(ContentManager content, GraphicsDevice graphics)
         {
@@ -73,9 +76,34 @@ namespace MonoGameAndroid1 {
         }
         public override void OnDraw(ref SpriteBatch spriteBatch)
         {
-            //Console.WriteLine("OnDraw"); 
             spriteBatch.Draw(background,new Rectangle(-50,0,screenSize.Item1+100,screenSize.Item2), Color.White);
-            board.Draw(ref spriteBatch,fieldTexture,pieceTexture);
+            
+            var fields = board.Fields;
+            var startPos = board.StartPos;
+            var pieces = board.Pieces;
+            var size = new Vector2i(80, 80);
+            Vector2i margin = new Vector2i(8,8);
+            
+            foreach (var field in fields)
+            {
+                spriteBatch.Draw(fieldTexture,
+                    new Rectangle(startPos.x + (field.pos.x * size.x), startPos.y + (field.pos.y * size.y), size.x,
+                        size.y), field.isDark ? Color.Gray : Color.White);
+            }
+
+            if (board.SelectedField.x > 0 && board.SelectedField.y > 0)
+            {
+                spriteBatch.Draw(fieldTexture,
+                    new Rectangle(startPos.x + (board.SelectedField.x * size.x), startPos.y + (board.SelectedField.y * size.y), size.x,
+                        size.y), Color.GreenYellow);
+            }
+
+            foreach (var piece in pieces)
+            {
+                spriteBatch.Draw(pieceTexture,
+                    new Rectangle(startPos.x + (piece.pos.x * size.x) + margin.x, startPos.y + (piece.pos.y * size.y)+margin.y, size.x - margin.x*2,
+                        size.y-margin.y*2), piece.color == Piece.PieceColor.Black ? Color.DarkGray : Color.White);
+            }
             spriteBatch.DrawString(font, "Score: " + 10.ToString(), new Vector2(10, 10), Color.White);
         }  
     }

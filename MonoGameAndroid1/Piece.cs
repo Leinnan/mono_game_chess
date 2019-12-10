@@ -17,5 +17,10 @@
             pos = new Vector2i(x,y);
             this.color = color;
         }
+
+        public void MoveToPos(Vector2i newPos)
+        {
+            pos = newPos;
+        }
     }
 }
