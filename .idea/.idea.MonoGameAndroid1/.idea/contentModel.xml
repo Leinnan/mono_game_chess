@@ -20,6 +20,7 @@
         <e p="Game1.cs" t="Include" />
         <e p="GameState.cs" t="Include" />
         <e p="MonoGameAndroid1.csproj" t="IncludeRecursive" />
+        <e p="Move.cs" t="Include" />
         <e p="obj" t="ExcludeRecursive" />
         <e p="Piece.cs" t="Include" />
         <e p="Properties" t="Include">

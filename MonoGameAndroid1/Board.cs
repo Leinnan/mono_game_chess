@@ -8,8 +8,9 @@ namespace MonoGameAndroid1
 {
     public class Board
     {
+        static readonly Vector2i WRONG_POS = new Vector2i(-1,-1);
         private Piece[] pieces = new Piece[Consts.PIECES_PER_PLAYER*2];
-        private Vector2i selectedField = new Vector2i(-1,-1);
+        private Vector2i selectedField = WRONG_POS;
         private List<Vector2i> possibleMoves = new List<Vector2i>();
         Field[] fields = new Field[Consts.BOARD_SIZE * Consts.BOARD_SIZE];
         public Vector2i StartPos { get; set; }
@@ -18,6 +19,14 @@ namespace MonoGameAndroid1
 
         public Vector2i SelectedField => selectedField;
 
+        public List<Vector2i> PossibleMoves => possibleMoves;
+
+        public bool AnyFieldSelected
+        {
+            get => SelectedField != WRONG_POS;
+            set => selectedField = value ? selectedField : WRONG_POS;
+        }
+        public Piece.PieceColor activeColor = Piece.PieceColor.White;
         public Board()
         {
             for (int y = 0,index = 0; y < Consts.BOARD_SIZE; y++)
@@ -66,10 +75,29 @@ namespace MonoGameAndroid1
 
             return false;
         }
+
+        public bool CanMovePieceFromSelectedField(int x, int y)
+        {
+            return possibleMoves.Contains(new Vector2i(x,y));
+        }
+
+        Piece.PieceColor PieceColorOnPos(int x, int y)
+        {
+            for (var i = 0; i < pieces.Length; i++)
+            {
+                if (pieces[i].pos.x == x && pieces[i].pos.y == y)
+                    return pieces[i].color;
+            }
+
+            return Piece.PieceColor.None;
+        }
         
-        public bool CanMovePieceToPos(int x,int y)
+        bool CanMovePieceToPos(int x,int y)
         {
             if (x < 0 || x > Consts.BOARD_SIZE || y < 0 || y > Consts.BOARD_SIZE)
+                return false;
+
+            if (!FieldAtPos(x, y).isDark)
                 return false;
             
             for (var i = 0; i < pieces.Length; i++)
@@ -81,67 +109,54 @@ namespace MonoGameAndroid1
             return true;
         }
 
-        public void UpdatePosibleMoves(int x, int y)
+        void UpdatePosibleMoves(int x, int y)
         {
+            var pos = new Vector2i(x, y);
             if (!IsAnyPieceOnPos(x, y))
             {
+                if (possibleMoves.Contains(pos))
+                {
+                    MovePieceFromSelectedField(pos);
+                }
                 return;
             }
 
+            var piece = PieceOnPos(pos);
+
+            if (piece.color != activeColor)
+            {
+                return;
+            }
             selectedField.x = x;
             selectedField.y = y;
             possibleMoves.Clear();
             if (x > 0 && y > 0)
             {
-                if (CanMovePieceToPos(x - 1, y - 1) && FieldAtPos(x - 1, y - 1).isDark)
+                if (piece.MovesUp && CanMovePieceToPos(x - 1, y - 1))
                 {
                     Console.WriteLine($"Possible move on {x-1}x{y-1}");
                     possibleMoves.Add(new Vector2i(x-1,y-1));
                 }
             }
-            if (x > 0)
-            {
-                if (CanMovePieceToPos(x - 1, y) && FieldAtPos(x - 1, y).isDark)
-                {
-                    Console.WriteLine($"Possible move on {x-1}x{y}");
-                    possibleMoves.Add(new Vector2i(x-1,y));
-                }
-            }
             if (x > 0 && y < (Consts.BOARD_SIZE - 1))
             {
-                if (CanMovePieceToPos(x - 1, y + 1) && FieldAtPos(x - 1, y + 1).isDark)
+                if (piece.MovesDown && CanMovePieceToPos(x - 1, y + 1))
                 {
                     Console.WriteLine($"Possible move on {x-1}x{y+1}");
                     possibleMoves.Add(new Vector2i(x-1,y+1));
                 }
             }
-            if (y < (Consts.BOARD_SIZE - 1))
-            {
-                if (CanMovePieceToPos(x, y + 1) && FieldAtPos(x, y + 1).isDark)
-                {
-                    Console.WriteLine($"Possible move on {x}x{y+1}");
-                    possibleMoves.Add(new Vector2i(x,y+1));
-                }
-            }
             if (x < (Consts.BOARD_SIZE - 1) && y < (Consts.BOARD_SIZE - 1))
             {
-                if (CanMovePieceToPos(x+1, y + 1) && FieldAtPos(x + 1, y + 1).isDark)
+                if (piece.MovesDown && CanMovePieceToPos(x+1, y + 1))
                 {
                     Console.WriteLine($"Possible move on {x+1}x{y+1}");
                     possibleMoves.Add(new Vector2i(x+1,y+1));
                 }
             }
-            if (x < (Consts.BOARD_SIZE - 1))
-            {
-                if (CanMovePieceToPos(x+1, y ) && FieldAtPos(x + 1, y).isDark)
-                {
-                    Console.WriteLine($"Possible move on {x+1}x{y}");
-                    possibleMoves.Add(new Vector2i(x+1,y));
-                }
-            }
             if (x < (Consts.BOARD_SIZE - 1) && y > 0)
             {
-                if (CanMovePieceToPos(x+1, y - 1) && FieldAtPos(x + 1, y - 1).isDark)
+                if (piece.MovesUp && CanMovePieceToPos(x+1, y - 1))
                 {
                     Console.WriteLine($"Possible move on {x+1}x{y-1}");
                     possibleMoves.Add(new Vector2i(x+1,y-1));
@@ -149,14 +164,32 @@ namespace MonoGameAndroid1
             }
             if ( y > 0)
             {
-                if (CanMovePieceToPos(x, y - 1) && FieldAtPos(x, y - 1).isDark)
+                if (CanMovePieceToPos(x, y - 1))
                 {
                     Console.WriteLine($"Possible move on {x}x{y-1}");
                     possibleMoves.Add(new Vector2i(x,y-1));
                 }
             }
         }
-        
+
+        private Piece PieceOnPos(Vector2i pos)
+        {
+            foreach (var piece in pieces)
+            {
+                if (piece.pos == pos)
+                    return piece;
+            }
+
+            return null;
+        }
+
+        private void MovePieceFromSelectedField(Vector2i newPos)
+        {
+            var piece = PieceOnPos(selectedField);
+            piece.MoveToPos(newPos);
+            ChangePlayer();
+        }
+
         public void BoardClicked(Vector2 pos)
         {
             var size = new Vector2i(80, 80);
@@ -164,12 +197,20 @@ namespace MonoGameAndroid1
             {
                 var startPos = new Vector2(StartPos.x + (field.pos.x * size.x), StartPos.y + (field.pos.y * size.y));
                 var diff = pos - startPos;
-                if (diff.X > 0 && diff.X < size.x && diff.Y > 0 && diff.Y < size.y)
-                {
-                    Console.WriteLine($"Input on field {field.pos.x}x{field.pos.y}");
-                    UpdatePosibleMoves(field.pos.x,field.pos.y);
-                }
+                
+                if (!(diff.X > 0) || !(diff.X < size.x) || !(diff.Y > 0) || !(diff.Y < size.y))
+                    continue;
+                
+                Console.WriteLine($"Input on field {field.pos.x}x{field.pos.y}");
+                UpdatePosibleMoves(field.pos.x,field.pos.y);
             }
+        }
+
+        void ChangePlayer()
+        {
+            AnyFieldSelected = false;
+            possibleMoves.Clear();
+            activeColor = activeColor == Piece.PieceColor.White ? Piece.PieceColor.Black : Piece.PieceColor.White;
         }
         
         Field FieldAtPos(int x, int y)

@@ -81,6 +81,7 @@ namespace MonoGameAndroid1 {
             var fields = board.Fields;
             var startPos = board.StartPos;
             var pieces = board.Pieces;
+            var possibleMoves = board.PossibleMoves;
             var size = new Vector2i(80, 80);
             Vector2i margin = new Vector2i(8,8);
             
@@ -91,11 +92,17 @@ namespace MonoGameAndroid1 {
                         size.y), field.isDark ? Color.Gray : Color.White);
             }
 
-            if (board.SelectedField.x > 0 && board.SelectedField.y > 0)
+            if (board.AnyFieldSelected)
             {
                 spriteBatch.Draw(fieldTexture,
                     new Rectangle(startPos.x + (board.SelectedField.x * size.x), startPos.y + (board.SelectedField.y * size.y), size.x,
                         size.y), Color.GreenYellow);
+                foreach (var move in possibleMoves)
+                {
+                    spriteBatch.Draw(fieldTexture,
+                        new Rectangle(startPos.x + (move.x * size.x), startPos.y + (move.y * size.y), size.x,
+                            size.y), Color.LightYellow);
+                }
             }
 
             foreach (var piece in pieces)
