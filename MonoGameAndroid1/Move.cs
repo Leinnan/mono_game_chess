@@ -10,16 +10,28 @@ namespace MonoGameAndroid1
         private List<Vector2i> inBetweenSteps = new List<Vector2i>();
         private List<Vector2i> posToRemovePieces = new List<Vector2i>();
 
-        private Vector2i LastAddedPos => inBetweenSteps.Count > 0 ? inBetweenSteps.Last() : startPos;
+        private Vector2i LastAddedPos => inBetweenSteps.Count > 0 ? inBetweenSteps.Last() : StartPos;
+
+        public List<Vector2i> PosToRemovePieces => posToRemovePieces;
+
+        public Vector2i StartPos => startPos;
+
+        public Vector2i EndPos => endPos;
 
         public Move(Vector2i startPos)
         {
             this.startPos = startPos;
         }
 
+        public Move(Vector2i startPos, Vector2i endPos)
+        {
+            this.startPos = startPos;
+            this.endPos = endPos;
+        }
+
         public void AddNewStep(Vector2i nextPos)
         {
-            var posToRemove = (nextPos + LastAddedPos) / 2; 
+            var posToRemove = (nextPos + LastAddedPos) / 2;
             inBetweenSteps.Add(nextPos);
             posToRemovePieces.Add(posToRemove);
         }

@@ -14,6 +14,7 @@ namespace MonoGameAndroid1 {
         private Texture2D background;
         private Texture2D fieldTexture;
         private Texture2D pieceTexture;
+        private Texture2D pieceQueenTexture;
         private Texture2D emptyTexture;
         private (int,int) screenSize;
         private Board board = new Board();
@@ -66,6 +67,7 @@ namespace MonoGameAndroid1 {
             font = content.Load<SpriteFont>("Font");
             fieldTexture = content.Load<Texture2D>("field");
             pieceTexture = content.Load<Texture2D>("piece");
+            pieceQueenTexture = content.Load<Texture2D>("pieceQueen");
             background = content.Load<Texture2D>("bg");
             emptyTexture = new Texture2D(graphics, 1, 1);
             emptyTexture.SetData(new Color[]{Color.White});
@@ -80,7 +82,7 @@ namespace MonoGameAndroid1 {
             
             var fields = board.Fields;
             var startPos = board.StartPos;
-            var pieces = board.Pieces;
+            var pieces = board.AlivePieces;
             var possibleMoves = board.PossibleMoves;
             var size = new Vector2i(80, 80);
             Vector2i margin = new Vector2i(8,8);
@@ -100,14 +102,14 @@ namespace MonoGameAndroid1 {
                 foreach (var move in possibleMoves)
                 {
                     spriteBatch.Draw(fieldTexture,
-                        new Rectangle(startPos.x + (move.x * size.x), startPos.y + (move.y * size.y), size.x,
+                        new Rectangle(startPos.x + (move.EndPos.x * size.x), startPos.y + (move.EndPos.y * size.y), size.x,
                             size.y), Color.LightYellow);
                 }
             }
 
             foreach (var piece in pieces)
             {
-                spriteBatch.Draw(pieceTexture,
+                spriteBatch.Draw(piece.isQueen ? pieceQueenTexture : pieceTexture,
                     new Rectangle(startPos.x + (piece.pos.x * size.x) + margin.x, startPos.y + (piece.pos.y * size.y)+margin.y, size.x - margin.x*2,
                         size.y-margin.y*2), piece.color == Piece.PieceColor.Black ? Color.DarkGray : Color.White);
             }

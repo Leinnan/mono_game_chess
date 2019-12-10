@@ -12,6 +12,7 @@
         public bool isQueen = false;
         public Vector2i pos;
         public PieceColor color;
+        public bool Alive;
 
         public bool MovesUp => isQueen || color == PieceColor.Black;
         public bool MovesDown => isQueen || color == PieceColor.White;
@@ -20,6 +21,7 @@
         {
             pos = new Vector2i(x,y);
             this.color = color;
+            Alive = true;
         }
 
         public void MoveToPos(Vector2i newPos)
@@ -30,6 +32,11 @@
             {
                 isQueen = true;
             }
+        }
+
+        public void Kill()
+        {
+            Alive = false;
         }
     }
 }
