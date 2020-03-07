@@ -116,6 +116,7 @@ namespace MonoGameAndroid1
 
             return true;
         }
+        
         bool CheckPosForMove(Piece piece, Vector2i pos)
         {
             var moveCheck = piece.pos.y < pos.y ? piece.MovesDown : piece.MovesUp;
