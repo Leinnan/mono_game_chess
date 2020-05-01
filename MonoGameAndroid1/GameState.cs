@@ -24,6 +24,7 @@ namespace MonoGameAndroid1 {
         public override void OnInit()
         {
             Console.WriteLine("OnInit"); 
+            board.StartGame();
         }
         public override void OnShutdown()
         {

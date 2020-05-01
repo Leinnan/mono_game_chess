@@ -21,7 +21,7 @@ namespace MonoGameAndroid1
         public Vector2i StartPos { get; set; }
         public Field[] Fields => fields;
         public Piece[] AlivePieces => pieces.Where(piece => piece.Alive).ToArray();
-        private bool IsGameEnded => allPossibleMoves.Count == 0;
+        public bool IsGameEnded => allPossibleMoves.Count == 0;
 
         public Vector2i SelectedField => selectedField;
 
@@ -46,11 +46,9 @@ namespace MonoGameAndroid1
                     index++;
                 }
             }
-
-            StartGame();
         }
 
-        void StartGame()
+        public void StartGame()
         {
             pieces[0] = new Piece(0, 0, Piece.PieceColor.White);
             pieces[1] = new Piece(2, 0, Piece.PieceColor.White);
@@ -206,12 +204,28 @@ namespace MonoGameAndroid1
         {
             var piece = PieceOnPos(move.StartPos);
             piece.MoveToPos(move.EndPos);
+            
+            
+            //usuwamy te pionki
             foreach (var posToRemovePiece in move.PosToRemovePieces)
             {
                 var pieceToRemove = PieceOnPos(posToRemovePiece);
                 pieceToRemove.Kill();
             }
-            ChangePlayer();
+            
+            //teraz sprawdzamy czy po tym ruchu są usuniete jakieś pionki
+            bool piecesWereRemoved = move.PosToRemovePieces.Count > 0;
+            
+            // czyscimy mozliwe ruchy i sprawdzamy czy pionek ktory przesunelismy ma jakies bicia
+            allPossibleMoves.Clear();
+            CheckForCaptures(piece);
+            // teraz jesli nie ma zadnego bicia albo w poprzednim nie było zmieniamy gracza
+            if(!piecesWereRemoved || allPossibleMoves.Count == 0)
+            {
+                ChangePlayer();
+            }
+
+            selectedField = WRONG_POS;
         }
 
         public void BoardClicked(Vector2 pos)
