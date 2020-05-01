@@ -45,7 +45,7 @@ namespace MonoGameAndroid1
         protected override void LoadContent()
         {
             m_stateHandler.LoadAssets(Content, GraphicsDevice);
-            spriteBatch = new SpriteBatch (GraphicsDevice);
+            spriteBatch = new SpriteBatch(GraphicsDevice);
             m_stateHandler.Start("MenuState");
         }
 
@@ -66,9 +66,9 @@ namespace MonoGameAndroid1
         protected override void Update(GameTime gameTime)
         {
             m_stateHandler.Update(gameTime);
-            if(m_stateHandler.IsRequestingGameExit())
+            if (m_stateHandler.IsRequestingGameExit())
                 Exit();
-            base.Update (gameTime);
+            base.Update(gameTime);
         }
 
         /// <summary>
@@ -77,11 +77,11 @@ namespace MonoGameAndroid1
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear (Color.Gray);
-            spriteBatch.Begin ();
-            m_stateHandler.Draw( ref spriteBatch );
-            spriteBatch.End ();
-            base.Draw (gameTime);
+            GraphicsDevice.Clear(Color.Gray);
+            spriteBatch.Begin();
+            m_stateHandler.Draw(ref spriteBatch);
+            spriteBatch.End();
+            base.Draw(gameTime);
         }
     }
 }

@@ -9,13 +9,13 @@ namespace MonoGameAndroid1
         private SpriteFont font;
         private string text;
         private Rectangle rect;
-        
+
 
         public bool IsPosOverRect(Vector2 pos)
         {
             return rect.Contains(pos);
         }
-        
+
         public Button(Texture2D bg, SpriteFont font, string text, Rectangle rect)
         {
             this.bg = bg;
@@ -27,8 +27,8 @@ namespace MonoGameAndroid1
         public void Draw(ref SpriteBatch spriteBatch)
         {
             var size = rect.Center.ToVector2() - (font.MeasureString(text) / 2);
-            spriteBatch.Draw(bg,rect,Color.White);
-            spriteBatch.DrawString(font,text,size, Color.White);
+            spriteBatch.Draw(bg, rect, Color.White);
+            spriteBatch.DrawString(font, text, size, Color.White);
         }
     }
 }

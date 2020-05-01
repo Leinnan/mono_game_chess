@@ -48,7 +48,8 @@ namespace MonoGameAndroid1
             font = content.Load<SpriteFont>("Font");
             background = content.Load<Texture2D>("bgMenu");
             Texture2D btnTxt = content.Load<Texture2D>("btn");
-            newGameButton = new Button(btnTxt, font, "new game", new Rectangle((screenSize.Item1 - 360) / 2, 400, 360, 150));
+            newGameButton = new Button(btnTxt, font, "new game",
+                new Rectangle((screenSize.Item1 - 360) / 2, 400, 360, 150));
         }
 
         public override void OnUnload(ContentManager content, GraphicsDevice graphics)

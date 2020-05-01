@@ -1,6 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -8,13 +8,15 @@ namespace MonoGameAndroid1
 {
     public class Board
     {
-        static readonly Vector2i WRONG_POS = new Vector2i(-1,-1);
-        static readonly Vector2i[] directions = 
+        static readonly Vector2i WRONG_POS = new Vector2i(-1, -1);
+
+        static readonly Vector2i[] directions =
         {
-            new Vector2i(- 1,  - 1), new Vector2i( + 1,  - 1), new Vector2i( - 1,  + 1),
-            new Vector2i( + 1,  + 1),
+            new Vector2i(-1, -1), new Vector2i(+1, -1), new Vector2i(-1, +1),
+            new Vector2i(+1, +1),
         };
-        private Piece[] pieces = new Piece[Consts.PIECES_PER_PLAYER*2];
+
+        private Piece[] pieces = new Piece[Consts.PIECES_PER_PLAYER * 2];
         private Vector2i selectedField = WRONG_POS;
         private List<Move> allPossibleMoves = new List<Move>();
         Field[] fields = new Field[Consts.BOARD_SIZE * Consts.BOARD_SIZE];
@@ -25,22 +27,27 @@ namespace MonoGameAndroid1
 
         public Vector2i SelectedField => selectedField;
 
-        public List<Move> PossibleMoves => AnyFieldSelected ? allPossibleMoves.Where(move => move.StartPos == selectedField).ToList() : new List<Move>();
+        public List<Move> PossibleMoves => AnyFieldSelected
+            ? allPossibleMoves.Where(move => move.StartPos == selectedField).ToList()
+            : new List<Move>();
 
         public List<Vector2i> PiecesWithMoves => AlivePieces
             .Where(piece => allPossibleMoves.Any(move => move.StartPos == piece.pos)).Select(piece => piece.pos)
             .ToList();
+
         public bool AnyFieldSelected
         {
             get => SelectedField != WRONG_POS;
             private set => selectedField = value ? selectedField : WRONG_POS;
         }
+
         public Piece.PieceColor ActiveColor { get; set; }
+
         public Board()
         {
-            for (int y = 0,index = 0; y < Consts.BOARD_SIZE; y++)
+            for (int y = 0, index = 0; y < Consts.BOARD_SIZE; y++)
             {
-                for (int x = 0; x < Consts.BOARD_SIZE ; x++)
+                for (int x = 0; x < Consts.BOARD_SIZE; x++)
                 {
                     fields[index] = new Field(x, y);
                     index++;
@@ -79,7 +86,7 @@ namespace MonoGameAndroid1
             AnyFieldSelected = false;
             UpdatePosibleMoves();
         }
-        
+
         bool IsAnyPieceOnPos(Vector2i pos)
         {
             return AlivePieces.Any(piece => piece.pos == pos);
@@ -95,9 +102,8 @@ namespace MonoGameAndroid1
 
             return Piece.PieceColor.None;
         }
-        
-        
-        
+
+
         bool CanMovePieceToPos(Vector2i pos)
         {
             if (pos.x < 0 || pos.x >= Consts.BOARD_SIZE || pos.y < 0 || pos.y >= Consts.BOARD_SIZE)
@@ -105,7 +111,7 @@ namespace MonoGameAndroid1
 
             if (!FieldAtPos(pos).isDark)
                 return false;
-            
+
             for (var i = 0; i < pieces.Length; i++)
             {
                 if (pieces[i].pos == pos && pieces[i].Alive)
@@ -114,7 +120,7 @@ namespace MonoGameAndroid1
 
             return true;
         }
-        
+
         bool CheckPosForMove(Piece piece, Vector2i pos)
         {
             var moveCheck = piece.pos.y < pos.y ? piece.MovesDown : piece.MovesUp;
@@ -138,7 +144,7 @@ namespace MonoGameAndroid1
                 {
                     foreach (var direction in directions)
                     {
-                        for (int i = 1; i < Consts.BOARD_SIZE;++i)
+                        for (int i = 1; i < Consts.BOARD_SIZE; ++i)
                         {
                             var canMove = CheckPosForMove(piece, piece.pos + (direction * i));
                             if (!canMove)
@@ -150,7 +156,7 @@ namespace MonoGameAndroid1
                 {
                     foreach (var direction in directions)
                     {
-                        CheckPosForMove(piece, piece.pos+direction);
+                        CheckPosForMove(piece, piece.pos + direction);
                     }
                 }
 
@@ -204,23 +210,23 @@ namespace MonoGameAndroid1
         {
             var piece = PieceOnPos(move.StartPos);
             piece.MoveToPos(move.EndPos);
-            
-            
+
+
             //usuwamy te pionki
             foreach (var posToRemovePiece in move.PosToRemovePieces)
             {
                 var pieceToRemove = PieceOnPos(posToRemovePiece);
                 pieceToRemove.Kill();
             }
-            
+
             //teraz sprawdzamy czy po tym ruchu są usuniete jakieś pionki
             bool piecesWereRemoved = move.PosToRemovePieces.Count > 0;
-            
+
             // czyscimy mozliwe ruchy i sprawdzamy czy pionek ktory przesunelismy ma jakies bicia
             allPossibleMoves.Clear();
             CheckForCaptures(piece);
             // teraz jesli nie ma zadnego bicia albo w poprzednim nie było zmieniamy gracza
-            if(!piecesWereRemoved || allPossibleMoves.Count == 0)
+            if (!piecesWereRemoved || allPossibleMoves.Count == 0)
             {
                 ChangePlayer();
             }
@@ -235,14 +241,16 @@ namespace MonoGameAndroid1
             {
                 var startPos = new Vector2(StartPos.x + (field.pos.x * size.x), StartPos.y + (field.pos.y * size.y));
                 var diff = pos - startPos;
-                
+
                 if (!(diff.X > 0) || !(diff.X < size.x) || !(diff.Y > 0) || !(diff.Y < size.y))
                     continue;
-                
+
                 Console.WriteLine($"Input on field {field.pos.x}x{field.pos.y}");
                 if (AnyFieldSelected && !IsAnyPieceOnPos(field.pos))
                 {
-                    var move = PossibleMoves.Count > 0 ? PossibleMoves.FirstOrDefault(move1 => move1.EndPos == field.pos) : null;
+                    var move = PossibleMoves.Count > 0
+                        ? PossibleMoves.FirstOrDefault(move1 => move1.EndPos == field.pos)
+                        : null;
                     if (move != null)
                     {
                         MakeMove(move);
