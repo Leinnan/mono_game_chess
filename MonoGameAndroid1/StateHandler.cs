@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 
 namespace MonoGameAndroid1 {
     public class StateHandler{
@@ -30,7 +31,17 @@ namespace MonoGameAndroid1 {
             m_states.Find(x => x.Id.Equals(m_curState)).OnUpdate(gameTime);
 
             if(m_states.Find(x => x.Id.Equals(m_curState)).IsRequestingGameExit())
+            {
                 m_exitGameRequest = true;
+            }
+            else if (m_states.Find(x => x.Id.Equals(m_curState)).RequestingChangeState)
+            {
+                string newState = m_states.Find(x => x.Id.Equals(m_curState)).RequestedState;
+                if(m_states.Any(x => x.Id.Equals(newState)))
+                {
+                    SwitchState(newState);
+                }
+            }
         }
         public void RegisterState(State newState)
         {

@@ -59,10 +59,12 @@
   <ItemGroup>
     <Compile Include="Activity1.cs" />
     <Compile Include="Board.cs" />
+    <Compile Include="Button.cs" />
     <Compile Include="Consts.cs" />
     <Compile Include="Field.cs" />
     <Compile Include="Game1.cs" />
     <Compile Include="GameState.cs" />
+    <Compile Include="MenuState.cs" />
     <Compile Include="Move.cs" />
     <Compile Include="Piece.cs" />
     <Compile Include="Resources\Resource.Designer.cs" />

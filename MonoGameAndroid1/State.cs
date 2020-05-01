@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -13,6 +14,7 @@ namespace MonoGameAndroid1 {
         private bool m_exitGameRequest = false;
         private bool m_inputEnabled = true;
         private bool wereInputInLastFrame = false;
+        private string requestedState = string.Empty;
 
         Vector2 m_pressedMousePos;
         Vector2 m_mousePos;
@@ -20,12 +22,12 @@ namespace MonoGameAndroid1 {
         public abstract void OnInit();
         public abstract void OnShutdown();
         public abstract void OnUpdate(GameTime gameTime);
-        public abstract void OnEnter();
         public abstract void OnQuit();
         public abstract void OnLoad(ContentManager content, GraphicsDevice graphics);
         public abstract void OnUnload(ContentManager content, GraphicsDevice graphics);
         public abstract void OnDraw(ref SpriteBatch spriteBatch);
 
+        public virtual void OnEnter() {requestedState = string.Empty;}
         // input handling
         public virtual void OnKeyPressed (Keys pressedKey) {}
         public virtual void OnKeyHold (Keys holdedKey) {}
@@ -42,6 +44,12 @@ namespace MonoGameAndroid1 {
         }
         public bool IsRequestingGameExit(){ return m_exitGameRequest; }
         public void RequestGameExit(){ m_exitGameRequest = true; }
+
+        public void RequestState(string state) => requestedState = state;
+
+        public bool RequestingChangeState => requestedState.Length != 0;
+
+        public string RequestedState => requestedState;
         public bool IsInputEnabled(){ return m_inputEnabled; }
         public void EnableInput(){ m_inputEnabled = true; }
         public void DisableInput(){ m_inputEnabled = false; }
